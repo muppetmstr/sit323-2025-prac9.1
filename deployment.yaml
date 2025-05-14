@@ -1,0 +1,37 @@
+#node.js app
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-web-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-web-app
+  template:
+    metadata:
+      labels:
+        app: node-web-app
+    spec:
+      containers:
+        - name: node-web-app
+          image: jamespowis/node-web-app:latest
+          ports:
+            - containerPort: 8080 #exposes custom port
+          env:
+            - name: MONGO_URI
+              value: mongodb://mongouser:securepass@mongo-service:27017
+---
+#service for node.js app
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-web-service
+spec:
+  type: NodePort
+  selector:
+    app: node-web-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
